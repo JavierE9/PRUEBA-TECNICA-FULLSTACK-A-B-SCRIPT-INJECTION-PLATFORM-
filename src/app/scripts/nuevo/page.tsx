@@ -45,6 +45,11 @@ export default function PaginaNuevoScript() {
       return;
     }
 
+    if (!descripcion.trim()) {
+      toast.error('Por favor, introduce una descripción para el script');
+      return;
+    }
+
     if (!codigo.trim()) {
       toast.error('Por favor, escribe algo de código');
       return;
@@ -57,7 +62,7 @@ export default function PaginaNuevoScript() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nombre: nombre.trim(),
-          descripcion: descripcion.trim() || null,
+          descripcion: descripcion.trim(),
           codigo: codigo,
         }),
       });
@@ -116,7 +121,7 @@ export default function PaginaNuevoScript() {
         {/* Descripción */}
         <div>
           <label htmlFor="descripcion" className="block text-sm font-semibold text-gray-300 mb-2">
-            Descripción (opcional)
+            Descripción *
           </label>
           <textarea
             id="descripcion"
@@ -125,6 +130,7 @@ export default function PaginaNuevoScript() {
             placeholder="Describe qué hace este script..."
             rows={2}
             className="input"
+            required
           />
         </div>
 

@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS scripts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
-  descripcion TEXT,
+  descripcion TEXT NOT NULL,
   codigo TEXT NOT NULL,
   estado VARCHAR(20) DEFAULT 'borrador' CHECK (estado IN ('borrador', 'publicado')),
   id_publico VARCHAR(20) UNIQUE,

@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { formatearTiempoRelativo, obtenerUrlScriptPublico, copiarAlPortapapeles } from '@/lib/utilidades';
-import { Copy, ExternalLink, Trash2, Edit, Check } from 'lucide-react';
+import { Copy, Eye, Trash2, Edit, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import ModalConfirmacion from './ModalConfirmacion';
 
 interface PropsTarjetaScript {
   id: string;
   nombre: string;
-  descripcion?: string | null;
+  descripcion: string;
   estado: 'borrador' | 'publicado';
   fechaActualizacion: string;
   idPublico: string | null;
@@ -30,6 +31,7 @@ export default function TarjetaScript({
 }: PropsTarjetaScript) {
   const [copiado, setCopiado] = useState(false);
   const [eliminando, setEliminando] = useState(false);
+  const [modalConfirmacionAbierto, setModalConfirmacionAbierto] = useState(false);
 
   const urlPublica = idPublico ? obtenerUrlScriptPublico(idPublico) : null;
 
@@ -47,8 +49,6 @@ export default function TarjetaScript({
   };
 
   const manejarEliminar = async () => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este script?')) return;
-    
     setEliminando(true);
     try {
       const respuesta = await fetch(`/api/scripts/${id}`, { method: 'DELETE' });
@@ -75,9 +75,7 @@ export default function TarjetaScript({
               {estado === 'publicado' ? 'Publicado' : 'Borrador'}
             </span>
           </div>
-          {descripcion && (
-            <p className="text-sm text-gray-400 line-clamp-2">{descripcion}</p>
-          )}
+          <p className="text-sm text-gray-400 line-clamp-2">{descripcion}</p>
         </div>
       </div>
 
@@ -122,13 +120,13 @@ export default function TarjetaScript({
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#00d4ff] transition-colors"
           >
-            <ExternalLink className="w-4 h-4" />
+            <Eye className="w-4 h-4" />
             Ver Script
           </a>
         )}
         
         <button
-          onClick={manejarEliminar}
+          onClick={() => setModalConfirmacionAbierto(true)}
           disabled={eliminando}
           className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 transition-colors ml-auto disabled:opacity-50"
         >
@@ -136,6 +134,18 @@ export default function TarjetaScript({
           {eliminando ? 'Eliminando...' : 'Eliminar'}
         </button>
       </div>
+
+      {/* Modal de confirmación */}
+      <ModalConfirmacion
+        abierto={modalConfirmacionAbierto}
+        alCerrar={() => setModalConfirmacionAbierto(false)}
+        alConfirmar={manejarEliminar}
+        titulo="¿Eliminar script?"
+        mensaje={`¿Estás seguro de que quieres eliminar "${nombre}"? Esta acción no se puede deshacer.`}
+        textoBotonConfirmar="Eliminar"
+        textoBotonCancelar="Cancelar"
+        tipo="peligro"
+      />
     </div>
   );
 }

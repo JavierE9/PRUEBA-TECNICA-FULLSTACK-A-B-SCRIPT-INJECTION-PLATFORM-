@@ -1,15 +1,4 @@
 
-Resultados de Tests
-
-```
-✅ Test Suites: 3 passed, 3 total
-✅ Tests:       44 passed, 44 total
-✅ Snapshots:   0 total
-⏱️  Time:        ~2s
-```
-
----
-
 
 
 1. Configuración

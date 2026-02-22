@@ -11,7 +11,7 @@ export interface Script {
   id: string;
   codigo: string;
   nombre: string;
-  descripcion: string | null;
+  descripcion: string;
   estado: EstadoScript;
   id_publico: string | null;
   fecha_creacion: string;
@@ -23,7 +23,7 @@ export interface Script {
 export interface ScriptInsertar {
   codigo: string;
   nombre: string;
-  descripcion?: string | null;
+  descripcion: string;
   estado?: EstadoScript;
   id_publico?: string | null;
 }

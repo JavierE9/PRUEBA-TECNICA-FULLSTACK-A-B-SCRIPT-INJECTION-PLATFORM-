@@ -1,4 +1,4 @@
-# 🧪 Plataforma de Inyección de Scripts A/B
+#  Plataforma de Inyección de Scripts A/B
 
 Bueno, básicamente esto es una app web donde puedes escribir código JavaScript, guardarlo y después inyectarlo en cualquier página web que quieras. La idea es que puedas hacer experimentos A/B sin tener que tocar el código de la web original.
 

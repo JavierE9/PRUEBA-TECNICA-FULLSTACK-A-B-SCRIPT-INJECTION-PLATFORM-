@@ -1,0 +1,26 @@
+# Dependencias
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js
+/.next/
+/out/
+
+# Producción
+/build
+
+# Archivos de entorno
+.env*.local
+.env
+
+# Debug
+npm-debug.log*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Sistema
+.DS_Store

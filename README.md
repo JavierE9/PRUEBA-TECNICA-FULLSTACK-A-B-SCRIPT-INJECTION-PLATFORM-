@@ -4,7 +4,7 @@ Bueno, básicamente esto es una app web donde puedes escribir código JavaScript
 
 ##  Que tiene de interesante
 
--  **Editor Monaco** - Es el mismo editor que usa VS Code, así que te va a resultar familiar si vienes de ahí
+-  **Editor de Texto** - Editor simple para escribir código
 -  **Guardar como Borrador** - Puedes ir guardando tu trabajo sin que se publique todavía
 -  **Publicación Instantánea** - Cuando publicas, te genera una URL única que puedes usar donde sea
 -  **CORS Habilitado** - Funciona en cualquier dominio, no hay problema con eso

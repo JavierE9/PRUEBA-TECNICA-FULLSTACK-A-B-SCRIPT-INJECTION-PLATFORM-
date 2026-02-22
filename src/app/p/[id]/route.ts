@@ -13,7 +13,10 @@ interface Params {
  */
 export async function GET(request: Request, { params }: Params) {
   const idConExtension = params.id;
+  // Limpiar el ID removiendo .js si existe (por si se accede directamente sin rewrite)
   const idPublico = idConExtension.replace(/\.js$/, '');
+  
+  console.log('[Route /p/[id]] ID recibido:', idConExtension, '-> ID limpio:', idPublico);
   
   const resultado = await servicioScripts.obtenerPorIdPublico(idPublico);
   
@@ -33,7 +36,7 @@ console.warn('[AB Script Injection] Script con ID "${idPublico}" no encontrado o
     });
   }
 
-  // Envolver el código en un IIFE para ejecución segura
+
   const codigoEnvuelto = envolverEnIIFE(resultado.datos.codigo);
   
 
@@ -51,7 +54,13 @@ ${codigoEnvuelto}
       'Content-Type': 'application/javascript; charset=utf-8',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET',
-      'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   });
 }
+
+// Forzar que esta ruta sea dinámica (sin caché de Next.js)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;

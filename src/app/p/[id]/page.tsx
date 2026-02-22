@@ -28,7 +28,13 @@ export default function PaginaVistaPublica() {
 
       try {
         setCargando(true);
-        const respuesta = await fetch(`/p/${idLimpio}.js`);
+        // Usar cache: 'no-store' para evitar caché del navegador
+        const respuesta = await fetch(`/p/${idLimpio}.js`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         
         if (!respuesta.ok) {
           throw new Error('Script no encontrado');

@@ -13,8 +13,8 @@ import type { Script } from '@/tipos/basedatos';
 const EditorCodigo = dynamic(() => import('@/componentes/EditorCodigo'), {
   ssr: false,
   loading: () => (
-    <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-      <span className="text-gray-600">Cargando editor...</span>
+    <div className="h-96 rounded-lg flex items-center justify-center" style={{ background: 'rgba(22, 22, 35, 0.8)' }}>
+      <span className="text-gray-400">Cargando editor...</span>
     </div>
   ),
 });
@@ -145,9 +145,10 @@ export default function PaginaEditarScript() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-center h-64">
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <span className="text-gray-600">Cargando script...</span>
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-10 h-10 border-3 border-[#00ff88] border-t-transparent rounded-full animate-spin" 
+                 style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.3)' }} />
+            <span className="text-gray-400 font-medium">Cargando script...</span>
           </div>
         </div>
       </div>
@@ -166,13 +167,13 @@ export default function PaginaEditarScript() {
       <div className="mb-8">
         <Link
           href="/scripts"
-          className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center gap-1.5 text-gray-400 hover:text-[#00ff88] transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Volver a Mis Scripts
         </Link>
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-gray-900">Editar Script</h1>
+          <h1 className="text-4xl font-black bg-gradient-to-r from-[#00ff88] to-[#00d4ff] bg-clip-text text-transparent">Editar Script</h1>
           <span className={estaPublicado ? 'badge-publicado' : 'badge-borrador'}>
             {estaPublicado ? 'Publicado' : 'Borrador'}
           </span>
@@ -187,10 +188,10 @@ export default function PaginaEditarScript() {
       )}
 
       {/* Formulario */}
-      <div className="space-y-6">
+      <div className="space-y-6 tarjeta">
         {/* Nombre */}
         <div>
-          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="nombre" className="block text-sm font-semibold text-gray-300 mb-2">
             Nombre del Script *
           </label>
           <input
@@ -204,7 +205,7 @@ export default function PaginaEditarScript() {
 
         {/* Descripción */}
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="descripcion" className="block text-sm font-semibold text-gray-300 mb-2">
             Descripción (opcional)
           </label>
           <textarea
@@ -218,7 +219,7 @@ export default function PaginaEditarScript() {
 
         {/* Editor de Código */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
             Código JavaScript *
           </label>
           <EditorCodigo
@@ -229,7 +230,7 @@ export default function PaginaEditarScript() {
         </div>
 
         {/* Botones */}
-        <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-[rgba(45,45,65,0.8)]">
           <button
             onClick={manejarGuardar}
             disabled={guardando}
@@ -242,7 +243,7 @@ export default function PaginaEditarScript() {
           {estaPublicado ? (
             <button
               onClick={manejarDespublicar}
-              className="flex items-center gap-2 text-orange-600 hover:text-orange-800 font-medium"
+              className="flex items-center gap-2 text-orange-400 hover:text-orange-300 font-medium transition-colors"
             >
               <EyeOff className="w-5 h-5" />
               Despublicar
@@ -263,7 +264,7 @@ export default function PaginaEditarScript() {
               href={`/p/${script.id_publico}.js`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+              className="flex items-center gap-2 text-gray-400 hover:text-[#00d4ff] transition-colors"
             >
               <Eye className="w-5 h-5" />
               Ver Script Público

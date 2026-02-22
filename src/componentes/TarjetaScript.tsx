@@ -66,17 +66,17 @@ export default function TarjetaScript({
   };
 
   return (
-    <div className="tarjeta hover:shadow-md transition-shadow duration-200">
+    <div className="tarjeta group">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">{nombre}</h3>
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-lg font-bold text-white truncate group-hover:text-[#00ff88] transition-colors">{nombre}</h3>
             <span className={estado === 'publicado' ? 'badge-publicado' : 'badge-borrador'}>
               {estado === 'publicado' ? 'Publicado' : 'Borrador'}
             </span>
           </div>
           {descripcion && (
-            <p className="text-sm text-gray-500 line-clamp-2">{descripcion}</p>
+            <p className="text-sm text-gray-400 line-clamp-2">{descripcion}</p>
           )}
         </div>
       </div>
@@ -86,30 +86,30 @@ export default function TarjetaScript({
       </div>
 
       {estado === 'publicado' && urlPublica && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-3 rounded-lg" style={{ background: 'rgba(0, 255, 136, 0.05)', border: '1px solid rgba(0, 255, 136, 0.2)' }}>
           <div className="flex items-center justify-between">
-            <code className="text-xs text-gray-600 truncate flex-1 mr-2">
+            <code className="text-xs text-[#00ff88] truncate flex-1 mr-2 font-mono">
               {urlPublica}
             </code>
             <button
               onClick={manejarCopiar}
-              className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+              className="p-1.5 hover:bg-[rgba(0,255,136,0.1)] rounded transition-all duration-200"
               title="Copiar URL"
             >
               {copiado ? (
-                <Check className="w-4 h-4 text-green-600" />
+                <Check className="w-4 h-4 text-[#00ff88]" />
               ) : (
-                <Copy className="w-4 h-4 text-gray-600" />
+                <Copy className="w-4 h-4 text-gray-400 hover:text-[#00ff88]" />
               )}
             </button>
           </div>
         </div>
       )}
 
-      <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+      <div className="flex items-center gap-4 pt-4 border-t border-[rgba(45,45,65,0.8)]">
         <Link
           href={`/scripts/${id}`}
-          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-[#00d4ff] hover:text-[#00ff88] transition-colors font-medium"
         >
           <Edit className="w-4 h-4" />
           Editar
@@ -120,7 +120,7 @@ export default function TarjetaScript({
             href={urlPublica}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#00d4ff] transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
             Ver Script
@@ -130,7 +130,7 @@ export default function TarjetaScript({
         <button
           onClick={manejarEliminar}
           disabled={eliminando}
-          className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 transition-colors ml-auto disabled:opacity-50"
+          className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 transition-colors ml-auto disabled:opacity-50"
         >
           <Trash2 className="w-4 h-4" />
           {eliminando ? 'Eliminando...' : 'Eliminar'}

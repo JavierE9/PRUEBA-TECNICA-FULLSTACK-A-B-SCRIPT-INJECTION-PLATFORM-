@@ -19,10 +19,11 @@ export const servicioScripts = {
         .order('fecha_actualizacion', { ascending: false });
 
       if (error) throw error;
-      return { datos: data, error: null };
+      // Si no hay datos, devolvemos un array vacío en lugar de null
+      return { datos: data || [], error: null };
     } catch (error) {
       console.error('Error al obtener scripts:', error);
-      return { datos: null, error: 'Error al obtener los scripts' };
+      return { datos: [], error: 'Error al obtener los scripts' };
     }
   },
 

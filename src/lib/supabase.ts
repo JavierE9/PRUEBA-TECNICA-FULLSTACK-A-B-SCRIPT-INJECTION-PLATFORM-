@@ -17,13 +17,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient<BaseDatos>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false, // No usamos autenticación en este MVP
+    persistSession: false, 
   },
 });
 
 /**
- * Fábrica de cliente Supabase para el servidor
- * Crea una nueva instancia para cada petición para evitar compartir estado
+ *  Supabase para el servidor
  */
 export function crearClienteSupabaseServidor() {
   return createClient<BaseDatos>(supabaseUrl, supabaseAnonKey, {

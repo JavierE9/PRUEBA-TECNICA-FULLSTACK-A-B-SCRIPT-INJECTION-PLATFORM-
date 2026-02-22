@@ -17,27 +17,28 @@ export default function LayoutPrincipal({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className="dark">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
           {/* Barra de navegación */}
-          <nav className="bg-white border-b border-gray-200">
+          <nav className="border-b backdrop-blur-xl sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16">
                 <div className="flex items-center">
-                  <Link href="/" className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">AB</span>
+                  <Link href="/" className="flex items-center space-x-3 group">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110" 
+                         style={{ background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)', boxShadow: '0 0 20px rgba(0, 255, 136, 0.4)' }}>
+                      <span className="text-[#0d0d17] font-black text-sm">AB</span>
                     </div>
-                    <span className="font-semibold text-gray-900">
-                      Inyección de Scripts
+                    <span className="font-bold text-lg bg-gradient-to-r from-[#00ff88] to-[#00d4ff] bg-clip-text text-transparent">
+                      Script Injection
                     </span>
                   </Link>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <Link
                     href="/scripts"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-gray-400 hover:text-[#00ff88] transition-all duration-300 font-medium"
                   >
                     Mis Scripts
                   </Link>
@@ -58,6 +59,7 @@ export default function LayoutPrincipal({
           richColors 
           closeButton
           toastOptions={{ duration: 4000 }}
+          theme="dark"
         />
       </body>
     </html>

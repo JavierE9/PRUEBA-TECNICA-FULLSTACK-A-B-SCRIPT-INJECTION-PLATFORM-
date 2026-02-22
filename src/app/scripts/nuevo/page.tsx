@@ -83,22 +83,24 @@ export default function PaginaNuevoScript() {
       <div className="mb-8">
         <Link
           href="/scripts"
-          className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center gap-1.5 text-gray-400 hover:text-[#00ff88] transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Volver a Mis Scripts
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Crear Nuevo Script</h1>
-        <p className="mt-1 text-gray-600">
+        <h1 className="text-4xl font-black bg-gradient-to-r from-[#00ff88] to-[#00d4ff] bg-clip-text text-transparent">
+          Crear Nuevo Script
+        </h1>
+        <p className="mt-2 text-gray-400">
           Escribe código JavaScript que será inyectado en páginas web
         </p>
       </div>
 
       {/* Formulario */}
-      <div className="space-y-6">
+      <div className="space-y-6 tarjeta">
         {/* Nombre */}
         <div>
-          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="nombre" className="block text-sm font-semibold text-gray-300 mb-2">
             Nombre del Script *
           </label>
           <input
@@ -113,7 +115,7 @@ export default function PaginaNuevoScript() {
 
         {/* Descripción */}
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="descripcion" className="block text-sm font-semibold text-gray-300 mb-2">
             Descripción (opcional)
           </label>
           <textarea
@@ -128,7 +130,7 @@ export default function PaginaNuevoScript() {
 
         {/* Editor de Código */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
             Código JavaScript *
           </label>
           <EditorCodigo

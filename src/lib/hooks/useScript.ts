@@ -96,7 +96,7 @@ export function useScript(id: string) {
   const publicarScript = async () => {
     setPublicando(true);
     try {
-      // Primero guardamos los cambios
+
       const guardadoExitoso = await guardarScript();
       if (!guardadoExitoso) {
         setPublicando(false);

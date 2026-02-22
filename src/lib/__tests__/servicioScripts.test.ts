@@ -8,7 +8,7 @@ jest.mock('nanoid', () => ({
   customAlphabet: () => () => 'abc123xyz0'
 }));
 
-// Mock de Supabase
+
 jest.mock('../supabase', () => ({
   supabase: {
     from: jest.fn(() => ({
@@ -239,6 +239,288 @@ describe('ServicioScripts', () => {
       
       expect(resultado.datos).toBeNull();
       expect(resultado.error).toBe('Error al eliminar el script');
+    });
+  });
+
+  describe('buscar', () => {
+    const scriptsEjemplo = [
+      {
+        id: '1',
+        nombre: 'Banner Promocional',
+        descripcion: 'Banner de prueba A/B',
+        codigo: 'console.log("banner");',
+        estado: 'publicado',
+        fecha_actualizacion: '2026-02-20T10:00:00Z'
+      },
+      {
+        id: '2',
+        nombre: 'Cambio de Color',
+        descripcion: 'Cambia el color de fondo',
+        codigo: 'document.body.style.background = "blue";',
+        estado: 'borrador',
+        fecha_actualizacion: '2026-02-21T10:00:00Z'
+      },
+      {
+        id: '3',
+        nombre: 'Botón CTA',
+        descripcion: 'Mejora el botón principal',
+        codigo: 'const btn = document.querySelector(".btn");',
+        estado: 'publicado',
+        fecha_actualizacion: '2026-02-22T10:00:00Z'
+      },
+    ];
+
+    it('debe buscar scripts sin filtro y retornar primera página', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo,
+          error: null,
+          count: 3
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('', 1, 9);
+
+      expect(resultado.error).toBeNull();
+      expect(resultado.datos).toBeDefined();
+      expect(resultado.datos?.scripts).toHaveLength(3);
+      expect(resultado.datos?.total).toBe(3);
+      expect(resultado.datos?.pagina).toBe(1);
+      expect(resultado.datos?.totalPaginas).toBe(1);
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 8); // Primera página: 0 a 8
+    });
+
+    it('debe buscar por nombre y retornar resultados coincidentes', async () => {
+      const scriptsCoincidentes = [scriptsEjemplo[0]]; // Solo "Banner Promocional"
+      
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        or: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsCoincidentes,
+          error: null,
+          count: 1
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('banner', 1, 9);
+
+      expect(resultado.error).toBeNull();
+      expect(resultado.datos?.scripts).toHaveLength(1);
+      expect(resultado.datos?.scripts[0].nombre).toBe('Banner Promocional');
+      expect(mockQuery.or).toHaveBeenCalledWith('nombre.ilike.%banner%,descripcion.ilike.%banner%');
+    });
+
+    it('debe buscar por descripción y retornar resultados coincidentes', async () => {
+      const scriptsCoincidentes = [scriptsEjemplo[1]]; // "Cambia el color de fondo"
+      
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        or: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsCoincidentes,
+          error: null,
+          count: 1
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('color', 1, 9);
+
+      expect(resultado.error).toBeNull();
+      expect(resultado.datos?.scripts).toHaveLength(1);
+      expect(resultado.datos?.scripts[0].descripcion).toContain('color');
+    });
+
+    it('debe retornar array vacío cuando no hay coincidencias', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        or: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [],
+          error: null,
+          count: 0
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('noexistente', 1, 9);
+
+      expect(resultado.error).toBeNull();
+      expect(resultado.datos?.scripts).toEqual([]);
+      expect(resultado.datos?.total).toBe(0);
+      expect(resultado.datos?.totalPaginas).toBe(0);
+    });
+
+    it('debe paginar correctamente - segunda página', async () => {
+      const scriptsPagina2 = [scriptsEjemplo[2]];
+      
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsPagina2,
+          error: null,
+          count: 11 // Total de 11 scripts
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('', 2, 9); // Página 2, 9 por página
+
+      expect(resultado.error).toBeNull();
+      expect(resultado.datos?.pagina).toBe(2);
+      expect(resultado.datos?.total).toBe(11);
+      expect(resultado.datos?.totalPaginas).toBe(2); // Math.ceil(11/9) = 2
+      expect(mockQuery.range).toHaveBeenCalledWith(9, 17); // Segunda página: 9 a 17
+    });
+
+    it('debe calcular correctamente el total de páginas', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo,
+          error: null,
+          count: 27 // 27 scripts totales
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('', 1, 9);
+
+      expect(resultado.datos?.totalPaginas).toBe(3); // Math.ceil(27/9) = 3
+    });
+
+    it('debe paginar con tamaño personalizado', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo.slice(0, 2),
+          error: null,
+          count: 100
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('', 1, 2); // 2 por página
+
+      expect(resultado.datos?.totalPaginas).toBe(50); // Math.ceil(100/2) = 50
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 1); // Primera página: 0 a 1
+    });
+
+    it('debe buscar con espacios en blanco y filtrar correctamente', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        or: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [scriptsEjemplo[0]],
+          error: null,
+          count: 1
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('  banner  ', 1, 9);
+
+      expect(resultado.error).toBeNull();
+      expect(mockQuery.or).toHaveBeenCalledWith('nombre.ilike.%  banner  %,descripcion.ilike.%  banner  %');
+    });
+
+    it('debe ordenar por fecha_actualizacion descendente', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo,
+          error: null,
+          count: 3
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      await servicioScripts.buscar('', 1, 9);
+
+      expect(mockQuery.order).toHaveBeenCalledWith('fecha_actualizacion', { ascending: false });
+    });
+
+    it('debe manejar errores de base de datos', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: null,
+          error: new Error('Error de conexión'),
+          count: null
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('test', 1, 9);
+
+      expect(resultado.error).toBe('Error al buscar scripts');
+      expect(resultado.datos?.scripts).toEqual([]);
+      expect(resultado.datos?.total).toBe(0);
+      expect(resultado.datos?.totalPaginas).toBe(0);
+    });
+
+    it('debe manejar count null o undefined', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo,
+          error: null,
+          count: null // Simular count ausente
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      const resultado = await servicioScripts.buscar('', 1, 9);
+
+      expect(resultado.datos?.total).toBe(0);
+      expect(resultado.datos?.totalPaginas).toBe(0);
+    });
+
+    it('debe usar valores predeterminados para página y porPagina', async () => {
+      const mockFrom = supabase.from as jest.Mock;
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        or: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: scriptsEjemplo,
+          error: null,
+          count: 3
+        }),
+      };
+      mockFrom.mockReturnValue(mockQuery);
+
+      // Llamar con búsqueda para que se llame al método .or()
+      const resultado = await servicioScripts.buscar('test');
+
+      expect(resultado.datos?.pagina).toBe(1);
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 8); // Default: página 1, 9 por página
     });
   });
 });

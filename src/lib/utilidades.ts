@@ -4,8 +4,7 @@ import { customAlphabet } from 'nanoid';
  * Funciones de utilidad para la Plataforma de Inyección de Scripts A/B
  */
 
-// Generar identificadores únicos seguros para URLs públicas
-// Usamos un alfabeto personalizado sin caracteres ambiguos (0, O, l, 1)
+
 const alfabeto = '23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
 export const generarIdPublico = customAlphabet(alfabeto, 10);
 

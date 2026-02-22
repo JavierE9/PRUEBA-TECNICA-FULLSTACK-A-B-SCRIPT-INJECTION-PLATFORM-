@@ -28,6 +28,61 @@ export const servicioScripts = {
   },
 
   /**
+   * Buscar scripts por nombre o descripción con paginación
+   * @param busqueda - Texto a buscar en nombre o descripción
+   * @param pagina - Número de página (empieza en 1)
+   * @param porPagina - Cantidad de resultados por página
+   */
+  async buscar(busqueda: string, pagina: number = 1, porPagina: number = 9): Promise<RespuestaAPI<{
+    scripts: Script[];
+    total: number;
+    pagina: number;
+    totalPaginas: number;
+  }>> {
+    try {
+      const inicio = (pagina - 1) * porPagina;
+      const fin = inicio + porPagina - 1;
+
+
+      let query = supabase
+        .from('scripts')
+        .select('*', { count: 'exact' })
+        .order('fecha_actualizacion', { ascending: false });
+
+
+      if (busqueda && busqueda.trim()) {
+        query = query.or(`nombre.ilike.%${busqueda}%,descripcion.ilike.%${busqueda}%`);
+      }
+
+
+      query = query.range(inicio, fin);
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      const total = count || 0;
+      const totalPaginas = Math.ceil(total / porPagina);
+
+      return {
+        datos: {
+          scripts: data || [],
+          total,
+          pagina,
+          totalPaginas,
+        },
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error al buscar scripts:', error);
+      return {
+        datos: { scripts: [], total: 0, pagina: 1, totalPaginas: 0 },
+        error: 'Error al buscar scripts',
+      };
+    }
+  },
+
+  /**
    * Obtener un script por su ID interno
    */
   async obtenerPorId(id: string): Promise<RespuestaAPI<Script>> {
@@ -124,7 +179,7 @@ export const servicioScripts = {
    */
   async publicar(id: string): Promise<RespuestaAPI<Script>> {
     try {
-      // Primero verificamos si el script ya tiene un id_publico
+     
       const { datos: existente } = await this.obtenerPorId(id);
       
       const idPublico = existente?.id_publico || generarIdPublico();

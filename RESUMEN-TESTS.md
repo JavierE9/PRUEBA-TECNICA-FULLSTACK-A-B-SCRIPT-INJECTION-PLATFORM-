@@ -49,7 +49,7 @@ obtenerScriptTag (3 tests)
    - Mensaje de error personalizado
 ```
 
- `src/lib/__tests__/servicioScripts.test.ts` (9 tests)
+ `src/lib/__tests__/servicioScripts.test.ts` (24 tests)
 ```
  obtenerTodos (3 tests)
    - Array vacío cuando no hay scripts
@@ -74,6 +74,22 @@ obtenerScriptTag (3 tests)
  eliminar (2 tests)
    - Eliminación correcta
    - Manejo de errores al eliminar
+
+  buscar (14 tests) 
+   - Búsqueda sin filtro y paginación básica
+   - Búsqueda por nombre (case-insensitive)
+   - Búsqueda por descripción (case-insensitive)
+   - Sin resultados cuando no hay coincidencias
+   - Paginación correcta - segunda página
+   - Cálculo de total de páginas
+   - Paginación con tamaño personalizado
+   - Búsqueda con espacios en blanco
+   - Ordenamiento por fecha_actualizacion DESC
+   - Manejo de errores de base de datos
+   - Manejo de count null o undefined
+   - Uso de valores predeterminados (página=1, porPagina=9)
+   - Validación de estructura de respuesta
+   - Validación de rangos de paginación
 ```
 
   `src/lib/__tests__/tipos.test.ts` (8 tests)
@@ -114,7 +130,7 @@ obtenerScriptTag (3 tests)
 
 ---
 
-## 🚀 Comandos Disponibles
+## Comandos Disponibles
 
 ```bash
 # Ejecutar todos los tests
@@ -125,54 +141,117 @@ npm run test:watch
 
 # Con reporte de cobertura
 npm run test:coverage
+
+# Solo tests del buscador
+npm test -- servicioScripts.test -t "buscar"
+
+# Tests específicos por nombre
+npm test -- -t "debe buscar por nombre"
+
+# Ver output detallado
+npm test -- --verbose
 ```
 
----
 
-## 🎨 Características Implementadas
 
-### ✅ Configuración Completa
-- Soporte de TypeScript
-- Aliases de módulos (`@/` → `src/`)
-- Mocks de dependencias externas (nanoid, Supabase)
-- Entorno jsdom para simular navegador
 
-### ✅ Mocks Inteligentes
-- **nanoid**: Mock para evitar problemas con ESM
-- **Supabase**: Mock completo del cliente de base de datos
 
-### ✅ Tests Sencillos y Robustos
-- Sin dependencias de servicios externos
-- Sin fallos inesperados
-- Cobertura de casos exitosos y de error
-- Fácil de mantener y extender
+## Búsqueda y Paginación
 
----
+### Método `buscar()` - Completamente Probado
 
-## 📈 Cobertura de Código
+```typescript
+async buscar(
+  busqueda: string,          // Término de búsqueda (nombre o descripción)
+  pagina: number = 1,        // Página actual (default: 1)
+  porPagina: number = 9      // Scripts por página (default: 9)
+): Promise<RespuestaAPI<{
+  scripts: Script[];         // Scripts encontrados
+  total: number;             // Total de scripts sin paginar
+  pagina: number;            // Página actual
+  totalPaginas: number;      // Total de páginas calculadas
+}>>
+```
 
-Los tests cubren:
-- ✅ Todas las funciones de utilidad
-- ✅ Todas las operaciones del servicio de scripts
-- ✅ Validación de tipos TypeScript
-- ✅ Manejo de errores
-- ✅ Casos edge (código vacío, fechas, etc.)
+### Características Probadas
 
----
+ **Búsqueda Inteligente**
+- Case-insensitive (no importan mayúsculas/minúsculas)
+- Búsqueda en nombre Y descripción simultáneamente
+- Usa operador `ilike` de PostgreSQL/Supabase
+- Pattern: `nombre.ilike.%busqueda%,descripcion.ilike.%busqueda%`
 
-## 💡 Ventajas de la Implementación
+ **Paginación Eficiente**
+- Cálculo automático de offset: `(pagina - 1) * porPagina`
+- Range correcto: `range(inicio, fin)`
+- Total de páginas: `Math.ceil(total / porPagina)`
+- Maneja última página con scripts restantes
 
-1. **Sencillez**: Tests fáciles de entender y mantener
-2. **Confiabilidad**: No dependen de servicios externos
-3. **Velocidad**: Ejecución rápida (~2 segundos)
-4. **Mocks**: Implementación correcta de mocks para dependencias
-5. **TypeScript**: Soporte completo con tipado
-6. **Sin Errores**: Todos los tests pasan correctamente
-7. **Documentación**: Completamente documentado
+**Orden Inteligente**
+- Ordenamiento por `fecha_actualizacion DESC`
+- Scripts más recientes aparecen primero
+- Consistente en todas las consultas
 
----
+ **Manejo Robusto de Errores**
+- Errores de BD → mensaje apropiado
+- Count null/undefined → usa 0 como fallback
+- Sin resultados → array vacío (no error)
+- Validación de parámetros
 
-## 🔍 Notas Técnicas
+
+### Ejemplo de Query Generado
+
+```sql
+-- Búsqueda con paginación
+SELECT * FROM scripts
+WHERE nombre ILIKE '%banner%' OR descripcion ILIKE '%banner%'
+ORDER BY fecha_actualizacion DESC
+LIMIT 9 OFFSET 0;
+
+-- Count total (para calcular páginas)
+SELECT COUNT(*) FROM scripts
+WHERE nombre ILIKE '%banner%' OR descripcion ILIKE '%banner%';
+```
+
+### Estructura de Respuesta Validada
+
+```typescript
+// Respuesta exitosa
+{
+  datos: {
+    scripts: [
+      {
+        id: "uuid-123",
+        nombre: "Banner Promocional",
+        descripcion: "Banner de prueba A/B",
+        codigo: "console.log('test');",
+        estado: "publicado",
+        fecha_actualizacion: "2026-02-22T10:00:00Z",
+        // ... más campos
+      }
+    ],
+    total: 10,              // Total de scripts encontrados
+    pagina: 1,              // Página actual
+    totalPaginas: 2         // Math.ceil(10/9) = 2 páginas
+  },
+  error: null
+}
+
+// Respuesta con error
+{
+  datos: {
+    scripts: [],
+    total: 0,
+    pagina: 1,
+    totalPaginas: 0
+  },
+  error: "Error al buscar scripts"
+}
+```
+
+
+
+##  Notas Técnicas
 
 ### Mocks de nanoid
 ```typescript
@@ -187,21 +266,37 @@ jest.mock('../supabase', () => ({
   supabase: {
     from: jest.fn(() => ({
       select: jest.fn().mockReturnThis(),
-      // ... más métodos
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),        // Para búsqueda
+      range: jest.fn().mockReturnThis(),     // Para paginación
+      single: jest.fn(),
     })),
   },
 }));
 ```
 
----
+### Ejemplo de Mock para Búsqueda
+```typescript
+const mockQuery = {
+  select: jest.fn().mockReturnThis(),
+  order: jest.fn().mockReturnThis(),
+  or: jest.fn().mockReturnThis(),
+  range: jest.fn().mockResolvedValue({
+    data: scriptsEjemplo,
+    error: null,
+    count: 10  // Total de registros
+  }),
+};
+mockFrom.mockReturnValue(mockQuery);
 
-## ✨ Conclusión
+// Verificar que se llamó correctamente
+expect(mockQuery.or).toHaveBeenCalledWith(
+  'nombre.ilike.%banner%,descripcion.ilike.%banner%'
+);
+expect(mockQuery.range).toHaveBeenCalledWith(0, 8);
+```
 
-✅ **Implementación exitosa y completa**
-- 44 tests unitarios funcionando
-- 0 errores
-- Configuración profesional
-- Código limpio y mantenible
-- Documentación completa
-
-**¡Listo para producción!** 🚀

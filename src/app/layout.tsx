@@ -35,20 +35,6 @@ export default function LayoutPrincipal({
                     </span>
                   </Link>
                 </div>
-                <div className="flex items-center space-x-6">
-                  <Link
-                    href="/scripts"
-                    className="text-gray-400 hover:text-[#00ff88] transition-all duration-300 font-medium"
-                  >
-                    Mis Scripts
-                  </Link>
-                  <Link
-                    href="/scripts/nuevo"
-                    className="btn-primario text-sm"
-                  >
-                    Nuevo Script
-                  </Link>
-                </div>
               </div>
             </div>
           </nav>

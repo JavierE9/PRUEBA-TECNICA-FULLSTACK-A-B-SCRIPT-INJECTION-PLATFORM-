@@ -12,14 +12,13 @@ interface Params {
  * Este endpoint es accesible sin autenticación y puede ser inyectado en cualquier página
  */
 export async function GET(request: Request, { params }: Params) {
-  // Extraer el ID limpio (sin la extensión .js)
   const idConExtension = params.id;
   const idPublico = idConExtension.replace(/\.js$/, '');
   
   const resultado = await servicioScripts.obtenerPorIdPublico(idPublico);
   
   if (resultado.error || !resultado.datos) {
-    // Devolver un script vacío con un comentario de error
+
     const scriptError = `// Script no encontrado o no publicado
 console.warn('[AB Script Injection] Script con ID "${idPublico}" no encontrado o no está publicado.');
 `;
@@ -37,7 +36,7 @@ console.warn('[AB Script Injection] Script con ID "${idPublico}" no encontrado o
   // Envolver el código en un IIFE para ejecución segura
   const codigoEnvuelto = envolverEnIIFE(resultado.datos.codigo);
   
-  // Añadir comentario de cabecera
+
   const scriptFinal = `/**
  * AB Script Injection Platform
  * Script ID: ${idPublico}

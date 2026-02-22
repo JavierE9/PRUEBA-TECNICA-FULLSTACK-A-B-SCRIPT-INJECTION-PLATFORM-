@@ -144,13 +144,10 @@ Desplegar esto en Vercel es lo más lógico porque Next.js y Vercel van de la ma
 
 También usaría un CDN como Cloudflare para cachear los scripts publicados, así no tengo que generarlos cada vez que alguien los pide. Esto reduce la carga en el servidor y mejora la velocidad.
 
-**Rate Limiting:**
-Hay que poner límites sino cualquiera puede hacer spam. Usaría algo como Upstash Rate Limit para limitar cuantos scripts puede crear un usuario por hora, y cuantas veces se puede acceder a un script público por IP.
 
-**Trade-offs:**
-- Multi-tenancy añade complejidad pero es necesario para escalar
-- RLS puede ser un poco más lento que hacer los filtros en la aplicación, pero es mucho más seguro
-- Cachear scripts públicos es genial para rendimiento pero hay que invalidar la caché cuando se actualiza un script
+
+
+
 
 ### 2. ¿Como evitar que el script rompa la página donde se inyecta?
 
@@ -198,13 +195,7 @@ Hay que poner límites sino cualquiera puede hacer spam. Usaría algo como Upsta
 8. **Timeout de ejecución:**
    Poner un límite de tiempo de ejecución. Si el script tarda más de X segundos, matarlo automáticamente.
 
-**Trade-offs:**
-- IIFE protege el scope pero no protege contra código malicioso intencional
-- Try-catch captura errores pero no evita código que consume muchos recursos
-- Shadow DOM es genial pero complica la integración con elementos existentes de la página
-- Web Workers son buenos pero limitan que puedes hacer (no puedes acceder al DOM directamente)
 
-La verdad es que nunca vas a poder proteger al 100% contra código malicioso, pero estas medidas reducen bastante el riesgo de errores accidentales que es lo más comun.
 
 ### 3. ¿Como implementaria versionado?
 
@@ -261,9 +252,19 @@ No es un sandbox real: el script puede acceder a todo (window, document, etc.)
 -  Sin validación: script puede romper la página destino
 -  Sin revisión: código malicioso puede publicarse
 -  Sin rollback automático: si falla, hay que borrar manualment
-- Guardar versiones completas usa más espacio que guardar diffs, pero el espacio es barato
-- Crear una versión en cada guardado puede ser mucho, quizás mejor solo al publicar o manualmente
-- Mantener muchas versiones puede hacer lenta la UI si no se pagina bien
+-  Guardar versiones completas usa más espacio que guardar diffs, pero el espacio es barato
+-  Crear una versión en cada guardado puede ser mucho, quizás mejor solo al publicar o manualmente
+-  Mantener muchas versiones puede hacer lenta la UI si no se pagina bien
+-  IIFE protege el scope pero no protege contra código malicioso intencional
+-  Try-catch captura errores pero no evita código que consume muchos recursos
+-  Shadow DOM es genial pero complica la integración con elementos existentes de la página
+-  Web Workers son buenos pero limitan que puedes hacer (no puedes acceder al DOM directamente)
+-  Multi-tenancy añade complejidad pero es necesario para escalar
+-  RLS puede ser un poco más lento que hacer los filtros en la aplicación, pero es mucho más seguro
+-  Cachear scripts públicos es genial para rendimiento pero hay que invalidar la caché cuando se actualiza un script
+- Rate Limiting: Hay que poner límites sino cualquiera puede hacer spam. Usaría algo como Upstash Rate Limit para limitar cuantos scripts puede crear un usuario por hora.
+
+La verdad es que nunca vas a poder proteger al 100% contra código malicioso, pero estas medidas reducen bastante el riesgo de errores accidentales que es lo más comun.
 
 ### 4. ¿Como añadiría testing A/B real y tracking de eventos?
 
@@ -467,9 +468,9 @@ GROUP BY v.id, v.nombre;
 - **Estilos:** Tailwind CSS (rápido de usar y queda bonito)
 - **Editor:** Monaco Editor (el mismo de VS Code, no tiene sentido reinventar la rueda)
 - **Notificaciones:** Sonner (para los toasts, muy simple de usar)
-- **Iconos:** Lucide React (tienen todo lo que necesitas)
 
-## 🔜 Cosas que me gustaria añadir
+
+##  Cosas que me gustaria añadir
 
 Hay un monton de cosas que se podrían mejorar pero por tiempo no las implementé:
 
@@ -480,13 +481,11 @@ Hay un monton de cosas que se podrían mejorar pero por tiempo no las implement�
 - [ ] Validación de sintaxis en tiempo real (mientras escribes)
 - [ ] Plantillas de scripts predefinidas (para empezar rápido)
 - [ ] API rate limiting (para que no te hagan spam)
-- [ ] Tests automatizados (porque testing es importante, lo sé jaja)
-- [ ] Dark mode (porque queda cool)
 - [ ] Exportar/importar scripts (para backups)
 - [ ] Colaboración en tiempo real (varios usuarios editando)
 - [ ] Minificación automática de scripts publicados (para que pesen menos)
 
-## � Notas finales
+
 
 Este proyecto fue interesante de hacer. Lo más complicado fue decidir como hacer el aislamiento de los scripts para que no rompan las páginas host, porque hay mil formas de hacerlo y todas tienen sus pros y contras.
 
@@ -494,12 +493,5 @@ Lo que más me gustó fue integrar Monaco Editor, es literalmente tener VS Code 
 
 Si tuviera más tiempo, definitivamente implementaría el sistema de A/B testing completo con tracking porque es la parte más interesante y lo que realmente le daría valor a la plataforma. Ahora mismo es solo un editor con persistencia, pero con A/B real sería una herramienta super potente para hacer experimentos.
 
-También añadiría tests unitarios y de integración porque aunque funciona, siempre hay edge cases que no contemplas y los tests te los encuentran antes de que los usuarios los vean.
 
-## 📄 Licencia
 
-MIT License - Úsalo como quieras, modificalo, lo que sea. Es código libre.
-
----
-
-Hecho con ☕ y algo de desespero para la prueba técnica de A/B Script Injection Platform

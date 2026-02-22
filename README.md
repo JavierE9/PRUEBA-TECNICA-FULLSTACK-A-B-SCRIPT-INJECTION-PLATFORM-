@@ -254,6 +254,13 @@ Guardaría cada versión completa (no diffs) porque:
 - Si en el futuro el espacio es problema, se puede comprimir o archivar versiones viejas
 
 **Trade-offs:**
+No es un sandbox real: el script puede acceder a todo (window, document, etc.)
+-  El try-catch solo captura errores, no previene código malicioso
+-  Script puede hacer requests a cualquier servidor
+-  Script puede inyectar código en el DOM de la página host
+-  Sin validación: script puede romper la página destino
+-  Sin revisión: código malicioso puede publicarse
+-  Sin rollback automático: si falla, hay que borrar manualment
 - Guardar versiones completas usa más espacio que guardar diffs, pero el espacio es barato
 - Crear una versión en cada guardado puede ser mucho, quizás mejor solo al publicar o manualmente
 - Mantener muchas versiones puede hacer lenta la UI si no se pagina bien

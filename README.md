@@ -8,7 +8,7 @@ Bueno, básicamente esto es una app web donde puedes escribir código JavaScript
 -  **Guardar como Borrador** - Puedes ir guardando tu trabajo sin que se publique todavía
 -  **Publicación Instantánea** - Cuando publicas, te genera una URL única que puedes usar donde sea
 -  **CORS Habilitado** - Funciona en cualquier dominio, no hay problema con eso
--  **Ejecución Segura** - Los scripts van envueltos en IIFE para que no rompan nada (o bueno, al menos lo intentan jaja)
+-  **Ejecución Segura** - Los scripts van envueltos en IIFE para que no rompan nada 
 -  **Persistencia en Supabase** - Todo se guarda en PostgreSQL a través de Supabase
 
 
@@ -268,7 +268,7 @@ La verdad es que nunca vas a poder proteger al 100% contra código malicioso, pe
 
 ### 4. ¿Como añadiría testing A/B real y tracking de eventos?
 
-Esto es lo más interesante porque es literalmente la razon de ser de esta plataforma jaja. Ahora mismo solo inyectas scripts, pero no sabes si funcionan mejor o peor.
+Esto es lo más interesante porque es literalmente la razon de ser de esta plataforma. Ahora mismo solo inyectas scripts, pero no sabes si funcionan mejor o peor.
 
 **Arquitectura de Experimentos:**
 
